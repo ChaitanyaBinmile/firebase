@@ -1,21 +1,21 @@
 import logo from "./logo.svg";
 import "./App.css";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { getToken} from 'firebase/messaging'
 import {messaging,app} from "./firebase"
 import {getDatabase ,ref,set} from 'firebase/database'
+import {useFirebase} from "./context/Firebase"
 
 const db = getDatabase(app);
 
 function App() {
 
-  const putData = () =>{
-    set(ref(db,'users'),{
-      id:1,
-      name:'chaitanya',
-      age:23
-    });
-  }
+  const [email,setEmail] = useState('')
+  const [password, setPassword] = useState('')
+
+
+  const firebase = useFirebase();
+  console.log(firebase)
 
   async function requestPermission() {
     const permission = await Notification.requestPermission();
@@ -34,10 +34,14 @@ function App() {
   }, []);
   return (
     <div className="App">
-     
-      <button onClick={putData}>
-        PUTdata
-      </button>
+     <h1>firebase</h1>
+     <input onChange={(e)=> setEmail(e.target.value)} value={email} type="email" placeholder="Enter Email"/>
+     <input onChange={(e)=> setPassword(e.target.value)} value={password}  type="password" placeholder="Enter Password"/>
+     <button onClick={()=>{
+      firebase.signupUser(email,password)
+      firebase.putData("users/" + "email", {email,password})
+      }}>SignUP</button>
+      <button onClick={()=>firebase.signUpWithGoogle()}>Sign in with google</button>
     </div>
   );
 }
